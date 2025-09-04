@@ -45,10 +45,7 @@ class AuthService:
         user = result.scalars().first()
         
         if not user or not verify_password(login_data.password, user.hashed_password):
-            return HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid email or password"
-            )
+            return None
         
         if user.status != UserStatus.ACTIVE:
             raise HTTPException(

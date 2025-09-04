@@ -1,5 +1,4 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.connection import get_db_session
 from app.core.security import verify_token
@@ -7,20 +6,24 @@ from app.services.auth import AuthService
 from app.models.user import User, UserStatus
 from typing import Optional
 
-security = HTTPBearer()
-
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
     db: AsyncSession = Depends(get_db_session)
 ) -> User:
-    """Get current authenticated user."""
-    token = credentials.credentials
+    """Get current authenticated user from cookie."""
+    token = request.cookies.get("access_token")
+    
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+        )
     
     try:
         payload = verify_token(token)
-        email: str = payload.get("sub")
-        if email is None:
+        user_id: int | None = payload.get("sub")
+        if user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials",
@@ -31,7 +34,7 @@ async def get_current_user(
             detail="Could not validate credentials",
         )
     
-    user = await AuthService.get_user_by_email(db, email=email)
+    user = await AuthService.get_user_by_id(db, user_id=user_id)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -54,25 +57,22 @@ async def get_current_active_user(
 
 
 async def get_optional_current_user(
-    authorization: Optional[str] = None,
+    request: Request,
     db: AsyncSession = Depends(get_db_session)
 ) -> Optional[User]:
     """Get current user if authenticated, otherwise None."""
-    if not authorization:
+    token = request.cookies.get("access_token")
+    
+    if not token:
         return None
     
     try:
-        from fastapi.security.utils import get_authorization_scheme_param
-        scheme, token = get_authorization_scheme_param(authorization)
-        if scheme.lower() != "bearer":
-            return None
-        
         payload = verify_token(token)
-        email: str = payload.get("sub")
-        if email is None:
+        user_id: int | None = payload.get("sub")
+        if user_id is None:
             return None
         
-        user = await AuthService.get_user_by_email(db, email=email)
+        user = await AuthService.get_user_by_id(db, user_id=user_id)
         return user
     except Exception:
         return None

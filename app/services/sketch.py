@@ -42,7 +42,7 @@ class SketchConverter:
         }
 
         # Create temp directory if it doesn't exist
-        os.makedirs(settings.TEMP_DIR, exist_ok=True)
+        os.makedirs(settings.temp_dir, exist_ok=True)
 
     def basic_sketch(self, image: np.ndarray) -> np.ndarray:
         """
@@ -379,8 +379,8 @@ class SketchService:
         """
         # Generate unique IDs for temporary files
         temp_id = str(uuid.uuid4())
-        input_path = os.path.join(settings.TEMP_DIR, f"input_{temp_id}.png")
-        output_path = os.path.join(settings.TEMP_DIR, f"output_{temp_id}.png")
+        input_path = os.path.join(settings.temp_dir, f"input_{temp_id}.png")
+        output_path = os.path.join(settings.temp_dir, f"output_{temp_id}.png")
 
         try:
             # Download the input image from S3

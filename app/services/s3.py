@@ -15,11 +15,11 @@ class S3Service:
 
     def __init__(self):
         """Initialize the S3 service with AWS credentials from settings."""
-        self.access_key = settings.AWS_ACCESS_KEY_ID
-        self.secret_key = settings.AWS_SECRET_ACCESS_KEY
-        self.region = settings.AWS_REGION
-        self.bucket_name = settings.AWS_BUCKET_NAME
-        self.expiration = settings.AWS_PRESIGNED_URL_EXPIRATION
+        self.access_key = settings.aws_access_key_id
+        self.secret_key = settings.aws_secret_access_key
+        self.region = settings.aws_region
+        self.bucket_name = settings.aws_bucket_name
+        self.expiration = settings.aws_presigned_url_expiration
 
     def get_s3_client(self) -> Any:
         """Get configured S3 client"""

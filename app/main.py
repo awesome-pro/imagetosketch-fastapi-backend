@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi.responses import RedirectResponse
 from app.core.config import settings
 from app.database.connection import close_redis_client
-from app.routers import auth, urls, analytics, redirect
+from app.routers import auth, upload, sketch, websocket
 import psutil
 
 @asynccontextmanager
@@ -34,7 +34,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return RedirectResponse(url="https://shortenurl.abhinandan.pro", status_code=302)
+    return {"message": "Image to Sketch API", "version": settings.app_version}
     
 @app.get("/health")
 def health_check():
@@ -49,6 +49,6 @@ def health_check():
 
 # Include routers
 app.include_router(auth.router, prefix="/api")
-app.include_router(urls.router, prefix="/api")
-app.include_router(analytics.router, prefix="/api")
-app.include_router(redirect.router)  # No prefix for redirect
+app.include_router(upload.router, prefix="/api")
+app.include_router(sketch.router, prefix="/api")
+app.include_router(websocket.router)

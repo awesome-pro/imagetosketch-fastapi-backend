@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     enable_analytics: bool = Field(default=True, env="ENABLE_ANALYTICS")
     cache_ttl: int = Field(default=3600, env="CACHE_TTL")  # 1 hour
     
-    # aws 
+    # AWS S3 Configuration
     aws_access_key_id: str = Field(default="", env="AWS_ACCESS_KEY_ID")
     aws_secret_access_key: str = Field(default="", env="AWS_SECRET_ACCESS_KEY")
     aws_region: str = Field(default="eu-north-1", env="AWS_REGION")
@@ -43,8 +43,19 @@ class Settings(BaseSettings):
     aws_endpoint_url: str = Field(default="https://abhi-psi.s3.eu-north-1.amazonaws.com", env="AWS_ENDPOINT_URL")
     aws_s3_signature_version: str = Field(default="s3v4", env="AWS_S3_SIGNATURE_VERSION")
     aws_s3_signature_algorithm: str = Field(default="AWS4-HMAC-SHA256", env="AWS_S3_SIGNATURE_ALGORITHM")
+    aws_presigned_url_expiration: int = Field(default=900, env="AWS_PRESIGNED_URL_EXPIRATION")  # 15 minutes
     
+    # File Processing
     temp_dir: str = Field(default="/tmp", env="TEMP_DIR")
+    max_file_size: int = Field(default=10 * 1024 * 1024, env="MAX_FILE_SIZE")  # 10MB
+    allowed_file_types: List[str] = Field(
+        default=["image/jpeg", "image/png", "image/webp", "image/gif"], 
+        env="ALLOWED_FILE_TYPES"
+    )
+    
+    # Background Tasks
+    max_concurrent_tasks: int = Field(default=5, env="MAX_CONCURRENT_TASKS")
+    task_timeout: int = Field(default=300, env="TASK_TIMEOUT")  # 5 minutes
     
     class Config:
         env_file = ".env"
