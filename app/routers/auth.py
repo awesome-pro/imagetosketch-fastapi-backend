@@ -9,7 +9,7 @@ from app.core.config import settings
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED,)
+@router.post("/sign-up", response_model=UserResponse, status_code=status.HTTP_201_CREATED,)
 async def register(
     user_data: UserCreate,
     response: Response,
@@ -29,7 +29,7 @@ async def register(
     return user
 
 
-@router.post("/login", response_model=UserResponse)
+@router.post("/sign-in", response_model=UserResponse)
 async def login(
     login_data: UserLogin,
     response: Response,
@@ -59,7 +59,7 @@ async def login(
     return user
 
 
-@router.post("/logout")
+@router.post("/sign-out")
 async def logout(response: Response):
     """Logout user by clearing the access token cookie."""
     response.delete_cookie(key="access_token")
