@@ -164,7 +164,7 @@ class SketchConverter:
             logger.error(f"Error in advanced_sketch: {e}")
             # Fallback to basic sketch if advanced fails
             return self.basic_sketch(image)
-
+        
     def artistic_sketch(self, image: np.ndarray) -> np.ndarray:
         """
         Create an artistic pencil sketch with more detail and texture.

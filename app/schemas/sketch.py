@@ -1,12 +1,12 @@
-from pydantic import BaseModel, HttpUrl, Field
+from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
 
 from app.models.sketch import SketchStatus, SketchType, SketchStyle
 
 class SketchBase(BaseModel):
-    original_image_url: HttpUrl
-    sketch_image_url: HttpUrl
+    original_image_url: str
+    sketch_image_url: str
     type: SketchType = SketchType.COLOR
     style: SketchStyle = SketchStyle.PENCIL
 
@@ -25,12 +25,11 @@ class SketchResponse(SketchBase):
     status: SketchStatus
     created_at: datetime
     updated_at: datetime
-    
+
 class SketchListResponse(BaseModel):
     sketches: List[SketchResponse]
     total: int
     page: int
     limit: int
-    
-    
-    
+
+

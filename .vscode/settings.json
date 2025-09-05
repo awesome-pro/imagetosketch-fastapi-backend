@@ -1,0 +1,38 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always",
+        "source.reorderImports": "always",
+        "source.fixAll.eslint": "always",
+        "source.fixAll.markdownlint": "always",
+        "source.fixAll.prettier": "always"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "codeium.windsurf",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always",
+            "source.reorderImports": "always",
+            "source.fixAll.eslint": "always",
+            "source.fixAll.markdownlint": "always",
+            "source.fixAll.prettier": "always"
+        }
+    },
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.linting.pylintEnabled": true,
+    "editor.rulers": [88],
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+}

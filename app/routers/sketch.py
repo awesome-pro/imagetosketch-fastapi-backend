@@ -18,54 +18,56 @@ router = APIRouter(prefix="/sketch", tags=["Sketch Processing"])
 
 
 async def process_sketch_background(
-    db: AsyncSession,
     sketch_id: int,
     input_key: str,
     method: str,
     config: Optional[Dict[str, Any]] = None
 ):
     """Background task to process sketch."""
-    try:
-        # Update status to processing
-        result = await db.execute(select(Sketch).where(Sketch.id == sketch_id))
-        sketch = result.scalars().first()
-        
-        if not sketch:
-            logger.error(f"Sketch {sketch_id} not found")
-            return
-        
-        sketch.status = SketchStatus.PROCESSING
-        await db.commit()
-        
-        # Process the image
-        processing_result = await sketch_service.process_image(
-            input_key=input_key,
-            method=method,
-            config=config
-        )
-        
-        if processing_result["success"]:
-            # Update sketch with result
-            sketch.sketch_image_url = processing_result["download_url"]
-            sketch.status = SketchStatus.COMPLETED
-        else:
-            # Mark as failed
-            sketch.status = SketchStatus.FAILED
-            logger.error(f"Sketch processing failed: {processing_result.get('error')}")
-        
-        await db.commit()
-        
-    except Exception as e:
-        logger.error(f"Background sketch processing failed: {str(e)}")
+    from app.database.connection import async_session_maker
+    
+    async with async_session_maker() as db:
         try:
-            # Mark as failed
+            # Update status to processing
             result = await db.execute(select(Sketch).where(Sketch.id == sketch_id))
             sketch = result.scalars().first()
-            if sketch:
+            
+            if not sketch:
+                logger.error(f"Sketch {sketch_id} not found")
+                return
+            
+            sketch.status = SketchStatus.PROCESSING
+            await db.commit()
+            
+            # Process the image
+            processing_result = await sketch_service.process_image(
+                input_key=input_key,
+                method=method,
+                config=config
+            )
+            
+            if processing_result["success"]:
+                # Update sketch with result
+                sketch.sketch_image_url = processing_result["download_url"]
+                sketch.status = SketchStatus.COMPLETED
+            else:
+                # Mark as failed
                 sketch.status = SketchStatus.FAILED
-                await db.commit()
-        except Exception as commit_error:
-            logger.error(f"Failed to update sketch status: {str(commit_error)}")
+                logger.error(f"Sketch processing failed: {processing_result.get('error')}")
+            
+            await db.commit()
+            
+        except Exception as e:
+            logger.error(f"Background sketch processing failed: {str(e)}")
+            try:
+                # Mark as failed
+                result = await db.execute(select(Sketch).where(Sketch.id == sketch_id))
+                sketch = result.scalars().first()
+                if sketch:
+                    sketch.status = SketchStatus.FAILED
+                    await db.commit()
+            except Exception as commit_error:
+                logger.error(f"Failed to update sketch status: {str(commit_error)}")
 
 
 @router.post("/create", response_model=Dict[str, Any])
@@ -95,8 +97,12 @@ async def create_sketch(
         )
     
     try:
+        logger.info(f"Creating sketch for user {current_user.id} with input_key: {input_key}")
+        logger.info(f"Style: {style}, Type: {sketch_type}, Method: {method}")
+        
         # Generate output key
         output_key = input_key.replace("uploads/", "sketches/").replace("/", f"/{method}_")
+        logger.info(f"Generated output_key: {output_key}")
         
         # Create sketch record
         db_sketch = Sketch(
@@ -146,22 +152,53 @@ async def create_sketch(
                 "kernel_size": 15
             })
         
-        # Start background processing using task manager
-        task_id = await task_manager.submit_task(
-            process_sketch_background,
-            db=db,
-            sketch_id=db_sketch.id,
-            input_key=input_key,
-            method=method,
-            config=config
-        )
+        # For now, let's process synchronously to debug the issue
+        # TODO: Move back to background processing once we fix the task manager issue
         
-        return {
-            "sketch_id": db_sketch.id,
-            "task_id": task_id,
-            "status": db_sketch.status.value,
-            "message": "Sketch processing started"
-        }
+        try:
+            # Update status to processing
+            db_sketch.status = SketchStatus.PROCESSING
+            await db.commit()
+            
+            # Process the image
+            logger.info(f"Starting sketch processing for sketch_id: {db_sketch.id}")
+            processing_result = await sketch_service.process_image(
+                input_key=input_key,
+                method=method,
+                config=config
+            )
+            logger.info(f"Processing result: {processing_result}")
+            
+            if processing_result["success"]:
+                # Update sketch with result
+                db_sketch.sketch_image_url = processing_result["download_url"]
+                db_sketch.status = SketchStatus.COMPLETED
+            else:
+                # Mark as failed
+                db_sketch.status = SketchStatus.FAILED
+                logger.error(f"Sketch processing failed: {processing_result.get('error')}")
+            
+            await db.commit()
+            await db.refresh(db_sketch)
+            
+            return {
+                "sketch_id": db_sketch.id,
+                "task_id": f"sync_{db_sketch.id}",
+                "status": db_sketch.status.value,
+                "message": "Sketch processing completed" if db_sketch.status == SketchStatus.COMPLETED else "Sketch processing failed"
+            }
+            
+        except Exception as processing_error:
+            logger.error(f"Sketch processing error: {str(processing_error)}")
+            db_sketch.status = SketchStatus.FAILED
+            await db.commit()
+            
+            return {
+                "sketch_id": db_sketch.id,
+                "task_id": f"sync_{db_sketch.id}",
+                "status": db_sketch.status.value,
+                "message": f"Sketch processing failed: {str(processing_error)}"
+            }
         
     except Exception as e:
         logger.error(f"Failed to create sketch: {str(e)}")
