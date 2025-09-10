@@ -4,7 +4,7 @@ from app.database.connection import get_db_session
 from app.core.deps import get_current_active_user
 from app.services.sketch import sketch_service
 from app.services.background_tasks import task_manager
-from app.schemas.sketch import SketchResponse, SketchCreate
+from app.schemas.sketch import SketchResponse
 from app.models.sketch import Sketch, SketchStatus, SketchStyle, SketchType
 from app.models.user import User
 from sqlalchemy import select

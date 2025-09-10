@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     app_name: str = Field(default="Image to Sketch", env="APP_NAME")
     app_version: str = Field(default="1.0.0", env="APP_VERSION")
     debug: bool = Field(default=False, env="DEBUG")
-    base_url: str = Field(default="http://localhost:8000", env="BASE_URL")
+    base_url: str = Field(default="http://localhost:8080", env="BASE_URL")
 
      # Cookie settings for cross-domain
     cookie_domain: str = Field(default=".abhinandan.pro", env="COOKIE_DOMAIN")  # Leading dot for subdomain sharing
