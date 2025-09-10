@@ -9,7 +9,7 @@ from app.models.sketch import Sketch, SketchStatus, SketchStyle, SketchType
 from app.models.user import User
 from sqlalchemy import select
 from typing import Dict, Any, List, Optional
-import uuid
+from app.core.config import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -106,8 +106,8 @@ async def create_sketch(
         
         # Create sketch record
         db_sketch = Sketch(
-            original_image_url=f"s3://{input_key}",  # Placeholder URL
-            sketch_image_url=f"s3://{output_key}",   # Placeholder URL
+            original_image_url=f"{settings.aws_endpoint_url}/{input_key}",
+            sketch_image_url=f"{settings.aws_endpoint_url}/{output_key}",
             status=SketchStatus.PENDING,
             type=sketch_type,
             style=style,

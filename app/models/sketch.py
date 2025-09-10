@@ -29,7 +29,7 @@ class SketchStyle(str, enum.Enum):
 class Sketch(Base):
     __tablename__ = "sketches"
 
-    id = Column(String(255), primary_key=True, index=True, default=str(uuid.uuid4()))
+    id = Column(String(255), primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     original_image_url = Column(Text, nullable=False)
     sketch_image_url = Column(Text, nullable=False)
     status = Column(Enum(SketchStatus), default=SketchStatus.PENDING, nullable=False)

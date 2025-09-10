@@ -29,7 +29,7 @@ class S3Service:
             region_name=self.region,
             aws_access_key_id=self.access_key,
             aws_secret_access_key=self.secret_key,
-            endpoint_url="https://s3.eu-north-1.amazonaws.com"
+            endpoint_url=settings.aws_endpoint_url,
         )
 
     async def get_presigned_upload_url(
@@ -231,7 +231,7 @@ class S3Service:
         try:
             # Use boto3 directly for consistency
             s3_client = self.get_s3_client()
-            
+
             # Set up extra args
             extra_args = {}
 
@@ -243,7 +243,7 @@ class S3Service:
                 content_type, _ = mimetypes.guess_type(local_path)
                 if content_type:
                     extra_args['ContentType'] = content_type
-            
+
             # First try without ACL since many buckets have ACLs disabled
             try:
                 # Upload the file without ACL
@@ -253,15 +253,15 @@ class S3Service:
                     key,
                     ExtraArgs=extra_args
                 )
-                
+
                 logger.info(f"Uploaded file to S3 without ACL: {local_path} -> {key}")
                 return True
-                
+
             except ClientError as e:
                 # If the error is not related to ACL, re-raise it
                 if 'AccessControlList' not in str(e):
                     raise
-                    
+
                 # If we get here, the bucket might support ACLs, so try with ACL if requested
                 if is_public:
                     logger.info(f"Retrying upload with ACL for {key}")
