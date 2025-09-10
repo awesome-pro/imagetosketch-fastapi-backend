@@ -22,7 +22,7 @@ class ConnectionManager:
         # Map WebSocket to user_id for cleanup
         self.connection_user_map: Dict[WebSocket, int] = {}
     
-    async def connect(self, websocket: WebSocket, user_id: int):
+    async def connect(self, websocket: WebSocket, user_id: str):
         """Connect a user's WebSocket."""
         await websocket.accept()
         
@@ -52,7 +52,7 @@ class ConnectionManager:
             
             logger.info(f"User {user_id} disconnected from WebSocket")
     
-    async def send_personal_message(self, message: dict, user_id: int):
+    async def send_personal_message(self, message: dict, user_id: str):
         """Send a message to all connections of a specific user."""
         if user_id in self.active_connections:
             disconnected = []
@@ -170,7 +170,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str = None):
 
 
 @router.get("/notifications/test/{user_id}")
-async def test_notification(user_id: int):
+async def test_notification(user_id: str):
     """Test endpoint to send a notification to a specific user."""
     await manager.send_personal_message(
         {

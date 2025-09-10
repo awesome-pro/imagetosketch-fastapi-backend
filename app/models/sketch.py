@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Text, Enum
+from sqlalchemy import Column, String, DateTime, ForeignKey, Text, Enum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.database.connection import Base
 import enum
+import uuid
 
 
 class SketchStatus(str, enum.Enum):
@@ -28,7 +29,7 @@ class SketchStyle(str, enum.Enum):
 class Sketch(Base):
     __tablename__ = "sketches"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(255), primary_key=True, index=True, default=str(uuid.uuid4()))
     original_image_url = Column(Text, nullable=False)
     sketch_image_url = Column(Text, nullable=False)
     status = Column(Enum(SketchStatus), default=SketchStatus.PENDING, nullable=False)
@@ -39,7 +40,7 @@ class Sketch(Base):
     style = Column(Enum(SketchStyle), default=SketchStyle.PENCIL, nullable=False)
     
     # Foreign Key
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String(255), ForeignKey("users.id"), nullable=False)
     
     # Relationship
     user = relationship("User", back_populates="sketches")

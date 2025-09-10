@@ -194,7 +194,7 @@ class BackgroundTaskManager:
     
     async def list_user_tasks(
         self,
-        user_id: int,
+        user_id: str,
         status_filter: Optional[str] = None
     ) -> list:
         """List tasks for a specific user."""

@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
 from app.models.sketch import SketchStatus, SketchType, SketchStyle
+from app.utils.pagination import PaginatedResponse
 
 class SketchBase(BaseModel):
     original_image_url: str
@@ -21,15 +22,10 @@ class SketchUpdate(SketchBase):
     style: Optional[SketchStyle] = None
 
 class SketchResponse(SketchBase):
-    id: int
+    id: str
     status: SketchStatus
     created_at: datetime
     updated_at: datetime
 
-class SketchListResponse(BaseModel):
-    sketches: List[SketchResponse]
-    total: int
-    page: int
-    limit: int
-
-
+class SketchListResponse(PaginatedResponse[SketchResponse]):
+    pass

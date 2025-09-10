@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     debug: bool = Field(default=False, env="DEBUG")
     base_url: str = Field(default="http://localhost:8000", env="BASE_URL")
     
+     # Cookie settings for cross-domain
+    cookie_domain: str = Field(default=".abhinandan.pro", env="COOKIE_DOMAIN")  # Leading dot for subdomain sharing
+    frontend_url: str = Field(default="https://imagetosketch.abhinandan.pro", env="FRONTEND_URL")
+    
     # CORS
     allowed_origins: List[str] = Field(
         default=["http://localhost:3000", "https://imagetosketch.abhinandan.pro"], 
@@ -57,6 +61,9 @@ class Settings(BaseSettings):
     max_concurrent_tasks: int = Field(default=5, env="MAX_CONCURRENT_TASKS")
     task_timeout: int = Field(default=300, env="TASK_TIMEOUT")  # 5 minutes
     
+    google_client_id: str = Field(default="", env="GOOGLE_CLIENT_ID")
+    google_client_secret: str = Field(default="", env="GOOGLE_CLIENT_SECRET")
+    google_redirect_uri: str = Field(default="https://imagetosketch.abhinandan.pro/auth/callback/google", env="GOOGLE_REDIRECT_URI")
     class Config:
         env_file = ".env"
         case_sensitive = False

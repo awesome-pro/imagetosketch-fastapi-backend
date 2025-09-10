@@ -18,7 +18,7 @@ router = APIRouter(prefix="/sketch", tags=["Sketch Processing"])
 
 
 async def process_sketch_background(
-    sketch_id: int,
+    sketch_id: str,
     input_key: str,
     method: str,
     config: Optional[Dict[str, Any]] = None
@@ -210,7 +210,7 @@ async def create_sketch(
 
 @router.get("/{sketch_id}", response_model=SketchResponse)
 async def get_sketch(
-    sketch_id: int,
+    sketch_id: str,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):
@@ -258,7 +258,7 @@ async def list_user_sketches(
 
 @router.delete("/{sketch_id}")
 async def delete_sketch(
-    sketch_id: int,
+    sketch_id: str,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db_session)
 ):

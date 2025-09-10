@@ -22,15 +22,13 @@ async def get_current_user(
     
     try:
         payload = verify_token(token)
-        user_id_str: str | None = payload.get("sub")
-        if user_id_str is None:
+        user_id: str | None = payload.get("sub")
+        if user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate credentials",
             )
         
-        # Convert string user_id back to integer
-        user_id = int(user_id_str)
     except ValueError:
         print("Exception in get_current_user: Invalid user ID format")
         raise HTTPException(
@@ -79,12 +77,10 @@ async def get_optional_current_user(
     
     try:
         payload = verify_token(token)
-        user_id_str: str | None = payload.get("sub")
-        if user_id_str is None:
+        user_id: str | None = payload.get("sub")
+        if user_id is None:
             return None
         
-        # Convert string user_id back to integer
-        user_id = int(user_id_str)
         user = await AuthService.get_user_by_id(db, user_id=user_id)
         return user
     except (ValueError, Exception):
