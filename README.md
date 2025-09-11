@@ -1,307 +1,403 @@
-# Image to Sketch API Backend
+# 🎨 ImageToSketch FastAPI Backend
 
-A complete FastAPI backend for converting images to sketches with JWT cookie authentication, S3 integration, and real-time notifications.
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.116.1-009485?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
+[![AWS S3](https://img.shields.io/badge/AWS_S3-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/s3/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
+
+> **A high-performance, production-ready FastAPI backend service that transforms images into artistic sketches using advanced computer vision algorithms and modern cloud architecture.**
 
 ## 🚀 Features
 
-### Authentication
-- **JWT Cookie-based Authentication**: Secure authentication using HTTP-only cookies
-- **User Management**: Registration, login, logout, and profile management
-- **Role-based Access Control**: Admin and user roles
+### 🔥 Core Capabilities
+- **Advanced Image Processing**: Convert images to sketches using OpenCV and NumPy algorithms
+- **Real-time Processing**: Asynchronous image processing with progress tracking
+- **Cloud Storage**: Seamless AWS S3 integration for scalable file storage
+- **WebSocket Notifications**: Real-time in-session updates for processing status
+- **Background Tasks**: Non-blocking image processing with FastAPI's background tasks
 
-### File Upload & Processing
-- **Direct S3 Upload**: Frontend uploads directly to S3 using presigned URLs
-- **Multiple Sketch Styles**: Pencil, charcoal, watercolor, ink, etc.
-- **Three Processing Methods**: Basic, advanced, and artistic sketch conversion
-- **Background Processing**: Async task processing optimized for Cloud Run
+### 🔐 Authentication & Security
+- **Google OAuth 2.0**: Secure social authentication integration
+- **JWT Tokens**: Stateless authentication with refresh token support
+- **Redis Session Management**: High-performance session storage and caching
+- **Rate Limiting**: Built-in protection against abuse and DDoS attacks
 
-### Real-time Features
-- **WebSocket Notifications**: Real-time updates on processing status
-- **Task Management**: Background task tracking with Redis
-- **Status Updates**: Live progress updates via WebSocket
+### 📊 Database & Performance
+- **PostgreSQL**: Robust relational database with ACID compliance
+- **SQLAlchemy 2.0**: Modern async ORM with type safety
+- **Alembic Migrations**: Version-controlled database schema management
+- **Connection Pooling**: Optimized database connections for scalability
 
-### Cloud-Ready
-- **Google Cloud Run Optimized**: Stateless design with Redis for coordination
-- **Scalable Architecture**: Handles concurrent processing efficiently
-- **Health Checks**: Built-in health monitoring endpoints
+### 🛠 Developer Experience
+- **Type Safety**: Full Pydantic integration with automatic validation
+- **API Documentation**: Auto-generated Swagger/OpenAPI documentation
+- **Code Quality**: Black, isort, and MyPy for consistent, type-safe code
+- **Testing**: Comprehensive test suite with pytest
+- **Docker Ready**: Production-optimized containerization
 
-## 🛠 Technology Stack
-
-- **FastAPI**: Modern Python web framework
-- **SQLAlchemy**: Async ORM with PostgreSQL
-- **Redis**: Task coordination and real-time messaging
-- **OpenCV**: Image processing and sketch conversion
-- **AWS S3**: File storage and CDN
-- **WebSockets**: Real-time communication
-- **JWT**: Secure authentication
-
-## 📁 Project Structure
+## 🏗 Architecture Overview
 
 ```
-backend/
-├── app/
-│   ├── core/
-│   │   ├── config.py          # Application settings
-│   │   ├── deps.py            # Cookie-based auth dependencies
-│   │   └── security.py        # JWT and password utilities
-│   ├── database/
-│   │   └── connection.py      # Database and Redis connections
-│   ├── models/
-│   │   ├── user.py           # User model
-│   │   └── sketch.py         # Sketch model with styles
-│   ├── routers/
-│   │   ├── auth.py           # Authentication endpoints
-│   │   ├── upload.py         # S3 upload endpoints
-│   │   ├── sketch.py         # Sketch processing endpoints
-│   │   └── websocket.py      # WebSocket notifications
-│   ├── schemas/
-│   │   ├── user.py           # User Pydantic models
-│   │   └── sketch.py         # Sketch Pydantic models
-│   ├── services/
-│   │   ├── auth.py           # Authentication service
-│   │   ├── s3.py             # S3 integration service
-│   │   ├── sketch.py         # Image processing service
-│   │   └── background_tasks.py # Task management service
-│   └── main.py               # FastAPI application
-├── requirements.txt          # Dependencies
-└── README.md                # This file
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Next.js       │    │   FastAPI        │    │   PostgreSQL    │
+│   Frontend      │◄──►│   Backend        │◄──►│   Database      │
+│                 │    │                  │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                              │                           
+                              ▼                           
+                    ┌──────────────────┐                  
+                    │   Redis Cache    │                  
+                    │   & Sessions     │                  
+                    └──────────────────┘                  
+                              │                           
+                              ▼                           
+                    ┌──────────────────┐                  
+                    │   AWS S3         │                  
+                    │   File Storage   │                  
+                    └──────────────────┘                  
 ```
 
-## 🔧 Environment Variables
+## 📦 Tech Stack
 
-Create a `.env` file with the following variables:
-
-```env
-# Database
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/imagetosketch
-
-# Redis
-REDIS_URL=redis://localhost:6379
-
-# JWT
-JWT_SECRET_KEY=your-secret-key-here
-JWT_ALGORITHM=HS256
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES=1440
-
-# Application
-APP_NAME=Image to Sketch API
-APP_VERSION=1.0.0
-DEBUG=false
-BASE_URL=https://your-domain.com
-ALLOWED_ORIGINS=["http://localhost:3000","https://your-frontend-domain.com"]
-
-# AWS S3
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_REGION=your-region
-AWS_BUCKET_NAME=your-bucket-name
-AWS_PRESIGNED_URL_EXPIRATION=900
-
-# Processing
-TEMP_DIR=/tmp
-MAX_FILE_SIZE=10485760
-ALLOWED_FILE_TYPES=["image/jpeg","image/png","image/webp","image/gif"]
-MAX_CONCURRENT_TASKS=5
-TASK_TIMEOUT=300
-```
+| Category | Technologies |
+|----------|-------------|
+| **Framework** | FastAPI 0.116.1, Uvicorn, Starlette |
+| **Database** | PostgreSQL, SQLAlchemy 2.0, Alembic |
+| **Cache** | Redis 5.2.1 |
+| **Authentication** | Google OAuth 2.0, JWT (python-jose) |
+| **Image Processing** | OpenCV 4.10.0, NumPy 1.26.4, Pillow |
+| **Cloud Storage** | AWS S3 (boto3), AWS SDK |
+| **Development** | Black, isort, MyPy, pytest |
+| **Deployment** | Docker, Docker Compose |
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### Prerequisites
+
+- Python 3.12+
+- PostgreSQL 16+
+- Redis 7+
+- Docker & Docker Compose (optional)
+
+### 1. Clone & Setup
 
 ```bash
-cd backend
+git clone https://github.com/awesome-pro/imagetosketch-fastapi-backend.git
+cd imagetosketch-fastapi-backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Set Up Database
+### 2. Environment Configuration
 
-```bash
-# Install and start PostgreSQL
-# Create database
-createdb imagetosketch
+Create a `.env` file in the project root:
 
-# Run migrations (you'll need to create these)
-alembic upgrade head
+```env
+# Database
+DATABASE_URL=postgresql://username:password@localhost:5432/imagetosketch
+DATABASE_TEST_URL=postgresql://username:password@localhost:5432/imagetosketch_test
+
+# Redis
+REDIS_URL=redis://localhost:6379/0
+
+# JWT Configuration
+SECRET_KEY=your-super-secret-jwt-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:3000/auth/callback
+
+# AWS S3
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=us-east-1
+S3_BUCKET_NAME=imagetosketch-storage
+
+# Application
+ENVIRONMENT=development
+API_V1_STR=/api/v1
+PROJECT_NAME="ImageToSketch API"
+CORS_ORIGINS=["http://localhost:3000"]
 ```
 
-### 3. Set Up Redis
+### 3. Database Setup
 
 ```bash
-# Install and start Redis
-redis-server
+# Run migrations
+alembic upgrade head
+
+# Create initial data (optional)
+python -m app.core.init_db
 ```
 
 ### 4. Run the Application
 
 ```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Development mode with hot reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Production mode
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker
 ```
 
-## 📚 API Documentation
+### 5. Docker Deployment (Recommended)
 
-### Authentication Endpoints
+```bash
+# Build and run with Docker Compose
+docker-compose up --build -d
 
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login (sets cookie)
-- `POST /api/auth/logout` - Logout (clears cookie)
-- `GET /api/auth/me` - Get current user info
+# View logs
+docker-compose logs -f api
+```
 
-### Upload Endpoints
+## 📡 API Endpoints
 
-- `POST /api/upload/presigned-url` - Get S3 presigned upload URL
-- `POST /api/upload/confirm` - Confirm successful upload
-- `GET /api/upload/download-url/{key}` - Get download URL
+### Authentication
+- `POST /api/v1/auth/google` - Google OAuth authentication
+- `POST /api/v1/auth/refresh` - Refresh JWT tokens
+- `POST /api/v1/auth/logout` - Logout user
 
-### Sketch Processing Endpoints
+### Image Processing
+- `POST /api/v1/images/upload` - Upload image for processing
+- `GET /api/v1/images/{image_id}` - Get image details
+- `POST /api/v1/images/{image_id}/process` - Convert image to sketch
+- `GET /api/v1/images/{image_id}/download` - Download processed sketch
 
-- `POST /api/sketch/create` - Create sketch processing job
-- `GET /api/sketch/{sketch_id}` - Get sketch details
-- `GET /api/sketch/` - List user sketches
-- `GET /api/sketch/task/{task_id}` - Get task status
-- `GET /api/sketch/styles/available` - Get available styles
-- `DELETE /api/sketch/{sketch_id}` - Delete sketch
+### User Management
+- `GET /api/v1/users/me` - Get current user profile
+- `PUT /api/v1/users/me` - Update user profile
+- `GET /api/v1/users/me/images` - Get user's images
 
-### WebSocket Endpoint
+### WebSocket
+- `WS /ws/{user_id}` - Real-time notifications and progress updates
 
-- `WS /ws?token=jwt_token` - Real-time notifications
+## 🧪 Testing
 
-## 🎨 Sketch Styles & Methods
+```bash
+# Run all tests
+pytest
 
-### Available Styles
-- **PENCIL**: Classic pencil sketch
-- **CHARCOAL**: Dark, textured charcoal effect
-- **WATERCOLOR**: Soft, blended watercolor style
-- **INK**: Sharp, high-contrast ink drawing
-- **PASTEL**: Soft pastel colors
-- **OIL**: Oil painting effect
-- **ACRYLIC**: Acrylic paint style
+# Run with coverage
+pytest --cov=app --cov-report=html
 
-### Processing Methods
-- **Basic**: Simple edge detection with basic processing
-- **Advanced**: High-quality with edge preservation and texture enhancement
-- **Artistic**: Enhanced details with sharpening and artistic effects
+# Run specific test file
+pytest tests/test_auth.py -v
 
-## 🔄 Workflow
+# Run tests in parallel
+pytest -n auto
+```
 
-1. **User Authentication**: Login via cookie-based JWT
-2. **File Upload**: Get presigned S3 URL and upload directly
-3. **Process Request**: Submit processing job with style preferences
-4. **Background Processing**: Async task processes the image
-5. **Real-time Updates**: WebSocket notifications on progress
-6. **Download**: Get processed sketch via download URL
+## 🔧 Development Tools
 
-## ☁️ Google Cloud Run Deployment
+### Code Quality
 
-### Dockerfile
+```bash
+# Format code
+black app tests
+isort app tests
+
+# Type checking
+mypy app
+
+# Run all quality checks
+make lint  # If using Makefile
+```
+
+### Database Operations
+
+```bash
+# Create new migration
+alembic revision --autogenerate -m "Add new table"
+
+# Apply migrations
+alembic upgrade head
+
+# Rollback migration
+alembic downgrade -1
+```
+
+## 🐳 Docker Configuration
+
+### Multi-stage Dockerfile
 
 ```dockerfile
-FROM python:3.11-slim
-
+# Production-optimized build
+FROM python:3.11-slim AS builder
 WORKDIR /app
-
-# Install system dependencies for OpenCV
-RUN apt-get update && apt-get install -y \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libavcodec-dev \
-    libavformat-dev \
-    libswscale-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+FROM python:3.11-slim
+WORKDIR /app
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY . .
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "$PORT"]
-```
-
-### Deploy Commands
-
-```bash
-# Build and deploy to Cloud Run
-gcloud builds submit --tag gcr.io/PROJECT_ID/imagetosketch-api
-gcloud run deploy imagetosketch-api \
-    --image gcr.io/PROJECT_ID/imagetosketch-api \
-    --platform managed \
-    --region us-central1 \
-    --allow-unauthenticated \
-    --memory 2Gi \
-    --cpu 2 \
-    --concurrency 100 \
-    --timeout 900
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ## 🔒 Security Features
 
-- **HTTP-only Cookies**: Prevents XSS attacks
-- **CORS Configuration**: Proper cross-origin settings
-- **Input Validation**: File type and size validation
-- **User Isolation**: Files are organized by user ID
-- **Presigned URLs**: Secure, time-limited S3 access
+- **Input Validation**: Pydantic models with comprehensive validation
+- **SQL Injection Protection**: SQLAlchemy ORM with parameterized queries  
+- **XSS Prevention**: Automatic request/response sanitization
+- **CORS Configuration**: Configurable cross-origin resource sharing
+- **Rate Limiting**: Redis-based request throttling
+- **File Upload Security**: Mime type validation and size limits
+- **JWT Security**: Secure token generation with proper expiration
 
-## 📊 Monitoring & Logging
+## 📊 Monitoring & Observability
 
-- **Health Check Endpoint**: `/health` with system metrics
-- **Structured Logging**: JSON logs for production
-- **Task Status Tracking**: Redis-based task monitoring
-- **Error Handling**: Comprehensive error responses
+### Health Checks
+- `GET /health` - Application health status
+- `GET /health/db` - Database connectivity check
+- `GET /health/redis` - Redis connectivity check
+- `GET /health/s3` - AWS S3 connectivity check
 
-## 🔧 Configuration
+### Metrics & Logging
 
-The application is highly configurable via environment variables. Key settings include:
+```python
+# Structured logging configuration
+import logging
+from app.core.logging import setup_logging
 
-- **Concurrency**: Control max concurrent tasks
-- **File Limits**: Set upload size and type restrictions
-- **Timeouts**: Configure processing timeouts
-- **S3 Settings**: Bucket configuration and presigned URL expiration
+setup_logging(level=logging.INFO)
+```
 
-## 🤝 Frontend Integration
+## 🚀 Performance Optimizations
 
-### Authentication Flow
-1. Frontend sends login credentials to `/api/auth/login`
-2. Backend sets HTTP-only cookie with JWT
-3. All subsequent requests automatically include the cookie
-4. Frontend can check auth status via `/api/auth/me`
+### Async/Await Pattern
+- Fully asynchronous request handling
+- Non-blocking database operations
+- Concurrent image processing
 
-### File Upload Flow
-1. Get presigned URL from `/api/upload/presigned-url`
-2. Upload directly to S3 using the presigned URL
-3. Confirm upload via `/api/upload/confirm`
-4. Submit processing job via `/api/sketch/create`
+### Caching Strategy
+- Redis caching for frequently accessed data
+- Image metadata caching
+- Session-based caching
 
-### Real-time Updates
-1. Connect to WebSocket with JWT token
-2. Listen for task update messages
-3. Update UI based on processing status
+### Background Processing
+- FastAPI background tasks for heavy operations
+- Celery integration ready (optional)
+- Progress tracking with WebSocket updates
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow PEP 8 style guidelines
+- Add type hints to all functions
+- Write comprehensive tests for new features
+- Update documentation for API changes
+- Use conventional commit messages
+
+## 📁 Project Structure
+
+```
+app/
+├── api/                    # API route handlers
+│   ├── v1/
+│   │   ├── endpoints/     # Individual endpoint modules
+│   │   └── api.py         # API router aggregation
+├── core/                   # Core application configuration
+│   ├── config.py          # Settings and configuration
+│   ├── security.py        # Authentication utilities
+│   └── database.py        # Database connection
+├── models/                 # SQLAlchemy models
+├── schemas/                # Pydantic schemas
+├── services/               # Business logic services
+│   ├── auth.py            # Authentication service
+│   ├── sketch.py # Image processing service
+│   └── s3.py         # File storage service
+├── utils/                  # Utility functions
+├── routers/                # FastAPI routers
+├── database/               # Database utilities
+│   └── migrations/        # Alembic migrations
+└── main.py                # Application entry point
+
+tests/                      # Test modules
+├── conftest.py            # Test configuration
+├── test_auth.py           # Authentication tests
+└── test_image_processing.py # Image processing tests
+
+docker-compose.yml          # Docker services configuration
+Dockerfile                 # Container definition
+requirements.txt           # Python dependencies
+alembic.ini                # Alembic configuration
+README.md                  # This file
+```
+
+## 📋 Environment Variables
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | ✅ | - |
+| `REDIS_URL` | Redis connection string | ✅ | - |
+| `SECRET_KEY` | JWT secret key | ✅ | - |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | ✅ | - |
+| `AWS_ACCESS_KEY_ID` | AWS access key | ✅ | - |
+| `S3_BUCKET_NAME` | S3 bucket name | ✅ | - |
+| `ENVIRONMENT` | Application environment | ❌ | `development` |
+| `API_V1_STR` | API version prefix | ❌ | `/api/v1` |
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Import Errors**: Ensure all dependencies are installed
-2. **Database Connection**: Check PostgreSQL is running and accessible
-3. **Redis Connection**: Ensure Redis server is running
-4. **S3 Permissions**: Verify AWS credentials and bucket permissions
-5. **File Processing**: Check OpenCV installation and temp directory permissions
-
-### Logs
-
-Check application logs for detailed error information:
+**Database Connection Errors**
 ```bash
-# Local development
-tail -f app.log
+# Check PostgreSQL status
+sudo systemctl status postgresql
 
-# Cloud Run
-gcloud logging read "resource.type=cloud_run_revision" --limit 50
+# Test connection
+psql -h localhost -U username -d imagetosketch
 ```
 
-This implementation provides a production-ready, scalable backend for your image-to-sketch application with modern best practices and Google Cloud Run optimization.
+**Redis Connection Issues**
+```bash
+# Check Redis status
+sudo systemctl status redis
+
+# Test connection
+redis-cli ping
+```
+
+**Image Processing Errors**
+```bash
+# Install system dependencies for OpenCV
+sudo apt-get update
+sudo apt-get install libgl1-mesa-glx libglib2.0-0
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **FastAPI** team for the incredible framework
+- **OpenCV** community for computer vision tools
+- **SQLAlchemy** for the powerful ORM
+- **Pydantic** for data validation
+
+---
+
+<div align="center">
+
+**[🔗 API Documentation](https://sketchbackend.abhinandan.pro/docs) | [📊 Redoc](https://sketchbackend.abhinandan.pro/redoc) | [🐳 Docker Hub](https://hub.docker.com)**
+
+*Built with ❤️ using FastAPI and modern Python*
+
+</div>
