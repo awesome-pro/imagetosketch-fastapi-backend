@@ -1,6 +1,8 @@
 # 🎨 ImageToSketch FastAPI Backend
 
 ## [🔗 API Documentation](https://sketchbackend.abhinandan.pro/docs)
+<img width="720" height="404" alt="Screenshot 2025-09-11 at 7 48 25 AM" src="https://github.com/user-attachments/assets/b5e78439-e548-4984-9e21-78a5c9f82a2d" />
+
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.116.1-009485?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
