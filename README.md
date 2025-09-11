@@ -1,5 +1,7 @@
 # 🎨 ImageToSketch FastAPI Backend
 
+## [🔗 API Documentation](https://sketchbackend.abhinandan.pro/docs)
+
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.116.1-009485?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
